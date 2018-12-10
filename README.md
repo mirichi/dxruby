@@ -1,4 +1,4 @@
-# Dxruby
+# DXRuby
 
 使う人は
 
