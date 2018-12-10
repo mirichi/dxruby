@@ -1,10 +1,10 @@
 /*
 ###################################
 #
-# DXRuby 1.4.5
+# DXRuby 1.4.6
 #
 ###################################
 */
-#define DXRUBY_VERSION "1.4.5"
+#define DXRUBY_VERSION "1.4.6"
 
 //#define DXRUBY15
