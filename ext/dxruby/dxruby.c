@@ -2716,7 +2716,8 @@ void merge( struct DXRubyPictureList *list, struct DXRubyPictureList *temp, int 
 
     while (num_elements--)
     {
-        list[right] = temp[right--];
+        list[right] = temp[right];
+        right--;
     }
 }
 
