@@ -245,14 +245,14 @@ static VALUE Font_initialize( int argc, VALUE *argv, VALUE obj )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "フォントの作成に失敗しました - D3DXCreateFontIndirect" );
+        rb_raise( eDXRubyError, "Create font error - D3DXCreateFontIndirect" );
     }
 
     font->hFont = CreateFontIndirect( &logfont );
 
     if( font->hFont == NULL )
     {
-        rb_raise( eDXRubyError, "フォントの作成に失敗しました - CreateFontIndirect" );
+        rb_raise( eDXRubyError, "Create font error - CreateFontIndirect" );
     }
 
     font->size = NUM2INT( size );
@@ -288,7 +288,7 @@ static VALUE Font_install( VALUE klass, VALUE vstr )
     result = AddFontResourceEx( RSTRING_PTR( vsjisstr ), 0x10, 0 );
     if( result == 0 )
     {
-        rb_raise( eDXRubyError, "フォントのインストールに失敗しました - Font_install" );
+        rb_raise( eDXRubyError, "Font install error - Font_install" );
     }
     vary2 = Font_enum( klass );
 
