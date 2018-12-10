@@ -142,7 +142,7 @@ static struct DXRubyTexture *Image_textureload( char *filename, D3DXIMAGE_INFO *
 
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - Image_textureload" );
+        rb_raise( eDXRubyError, "Out of memory - Image_textureload" );
     }
 
     /* ファイルを読み込んでテクスチャオブジェクトを作成する */
@@ -153,7 +153,7 @@ static struct DXRubyTexture *Image_textureload( char *filename, D3DXIMAGE_INFO *
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "ファイルの読み込みに失敗しました - %s", filename );
+        rb_raise( eDXRubyError, "Load error - %s", filename );
     }
 
     return texture;
@@ -191,7 +191,7 @@ VALUE Image_initialize_copy( VALUE self, VALUE obj )
     texture = (struct  DXRubyTexture *)malloc( sizeof( struct DXRubyTexture ) );
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - Image_dup" );
+        rb_raise( eDXRubyError, "Out of memory - Image_dup" );
     }
 
     DXRUBY_RETRY_START;
@@ -202,7 +202,7 @@ VALUE Image_initialize_copy( VALUE self, VALUE obj )
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - Image_dup" );
+        rb_raise( eDXRubyError, "Create texture error - Image_dup" );
     }
 
     texture->refcount = 1;
@@ -413,7 +413,7 @@ static VALUE Image_load( int argc, VALUE *argv, VALUE klass )
     /* デバイスオブジェクトの初期化チェック */
     if( g_pD3DDevice == NULL )
     {
-        rb_raise( eDXRubyError, "DirectX Graphicsが初期化されていません" );
+        rb_raise( eDXRubyError, "DirectX Graphics not initialized" );
     }
 
     rb_scan_args( argc, argv, "14", &vfilename, &vx, &vy, &vwidth, &vheight );
@@ -434,7 +434,7 @@ static VALUE Image_load( int argc, VALUE *argv, VALUE klass )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "ファイルの読み込みに失敗しました - %s", RSTRING_PTR( vsjisstr ) );
+        rb_raise( eDXRubyError, "Load error - %s", RSTRING_PTR( vsjisstr ) );
     }
 
     if( vx == Qnil )
@@ -450,14 +450,14 @@ static VALUE Image_load( int argc, VALUE *argv, VALUE klass )
         y = vy == Qnil ? 0 : NUM2INT( vy );
         if( x < 0 || x >= srcinfo.Width || y < 0 || y >= srcinfo.Height )
         {
-            rb_raise( eDXRubyError, "画像の原点位置が異常値です(x=%d,y=%d, tex_width=%d,tex_height=%d) - Image_load", x, y, srcinfo.Width, srcinfo.Height );
+            rb_raise( eDXRubyError, "Invalid the origin position(x=%d,y=%d, tex_width=%d,tex_height=%d) - Image_load", x, y, srcinfo.Width, srcinfo.Height );
         }
         width = vwidth == Qnil ? srcinfo.Width - x : NUM2INT( vwidth );
         height = vheight == Qnil ? srcinfo.Height - y : NUM2INT( vheight );
         if( srcinfo.Width - x < width || x + width > srcinfo.Width || srcinfo.Height - y < height || y + height > srcinfo.Height ||
             width < 0 || height < 0 )
         {
-            rb_raise( eDXRubyError, "画像のサイズが異常値です - Image_load" );
+            rb_raise( eDXRubyError, "Invalid size - Image_load" );
         }
     }
 
@@ -502,7 +502,7 @@ static VALUE Image_loadFromFileInMemory( VALUE klass, VALUE vstr )
     /* デバイスオブジェクトの初期化チェック */
     if( g_pD3DDevice == NULL )
     {
-        rb_raise( eDXRubyError, "DirectX Graphicsが初期化されていません" );
+        rb_raise( eDXRubyError, "DirectX Graphics not initialized" );
     }
 
     Check_Type(vstr, T_STRING);
@@ -514,7 +514,7 @@ static VALUE Image_loadFromFileInMemory( VALUE klass, VALUE vstr )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "イメージデータの読み込みに失敗しました - Image_loadFromFileInMemory" );
+        rb_raise( eDXRubyError, "Load error - Image_loadFromFileInMemory" );
     }
 
     /* テクスチャメモリ取得 */
@@ -522,7 +522,7 @@ static VALUE Image_loadFromFileInMemory( VALUE klass, VALUE vstr )
 
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - Image_loadFromFileInMemory" );
+        rb_raise( eDXRubyError, "Out of memory - Image_loadFromFileInMemory" );
     }
 
     DXRUBY_RETRY_START;
@@ -533,7 +533,7 @@ static VALUE Image_loadFromFileInMemory( VALUE klass, VALUE vstr )
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "イメージデータの読み込みに失敗しました - Image_loadFromFileInMemory" );
+        rb_raise( eDXRubyError, "Load error - Image_loadFromFileInMemory" );
     }
 
     texture->refcount = 1;
@@ -595,20 +595,20 @@ static VALUE Image_createFromArray( VALUE klass, VALUE vwidth, VALUE vheight, VA
     /* デバイスオブジェクトの初期化チェック */
     if( g_pD3DDevice == NULL )
     {
-        rb_raise( eDXRubyError, "DirectX Graphicsが初期化されていません" );
+        rb_raise( eDXRubyError, "DirectX Graphics not initialized" );
     }
 
     width = NUM2INT( vwidth );
     height = NUM2INT( vheight );
     Check_Type(array, T_ARRAY);
 
-    if( width <= 0 || height <= 0 ) rb_raise( eDXRubyError, "画像のサイズ指定が異常値です(width=%d,height=%d) - Image_loadToArray", width, height );
+    if( width <= 0 || height <= 0 ) rb_raise( eDXRubyError, "Invalid size(width=%d,height=%d) - Image_loadToArray", width, height );
 
     /* テクスチャメモリ取得 */
     texture = (struct  DXRubyTexture *)malloc( sizeof( struct DXRubyTexture ) );
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - Image_textureload" );
+        rb_raise( eDXRubyError, "Out of memory - Image_textureload" );
     }
 
     /* テクスチャサイズ割り出し */
@@ -623,14 +623,14 @@ static VALUE Image_createFromArray( VALUE klass, VALUE vwidth, VALUE vheight, VA
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - Image_initialize" );
+        rb_raise( eDXRubyError, "Create texture error - Image_initialize" );
     }
 
     /* テクスチャロック */
     hr = texture->pD3DTexture->lpVtbl->LockRect( texture->pD3DTexture, 0, &LockedRect, NULL, 0 );
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "サーフェイスのロックに失敗しました - LockRect" );
+        rb_raise( eDXRubyError, "Surface lock error - LockRect" );
     }
 
     /* 書き込み */
@@ -702,14 +702,14 @@ static VALUE Image_slice_instance( int argc, VALUE *argv, VALUE vsrcimage )
         y = vy == Qnil ? 0 : NUM2INT( vy );
         if( x < 0 || x >= srcimage->width || y < 0 || y >= srcimage->height )
         {
-            rb_raise( eDXRubyError, "画像の原点位置が異常値です(x=%d,y=%d, tex_width=%d,tex_height=%d) - Image_slice", x, y, srcimage->width, srcimage->height );
+            rb_raise( eDXRubyError, "Invalid the origin position(x=%d,y=%d, tex_width=%d,tex_height=%d) - Image_slice", x, y, srcimage->width, srcimage->height );
         }
         width = vwidth == Qnil ? srcimage->width - x : NUM2INT( vwidth );
         height = vheight == Qnil ? srcimage->height - y : NUM2INT( vheight );
         if( srcimage->width - x < width || x + width > srcimage->width || srcimage->height - y < height || y + height > srcimage->height ||
             width < 0 || height < 0 )
         {
-            rb_raise( eDXRubyError, "画像のサイズが異常値です - Image_slice" );
+            rb_raise( eDXRubyError, "Invalid size - Image_slice" );
         }
     }
 
@@ -826,7 +826,7 @@ VALUE Image_sliceToArray( int argc, VALUE *argv, VALUE self )
     x = NUM2INT( argv[0] );
     y = NUM2INT( argv[1] );
 
-    if( x <= 0 || y <= 0 ) rb_raise( eDXRubyError, "画像の数指定が異常値です(x=%d,y=%d) - Image_sliceToArray", x, y );
+    if( x <= 0 || y <= 0 ) rb_raise( eDXRubyError, "Invalid count(x=%d,y=%d) - Image_sliceToArray", x, y );
 
     /* 元Imageのチェック */
     srcimage = DXRUBY_GET_STRUCT( Image, self );
@@ -1750,7 +1750,7 @@ static VALUE Image_copyRect( int argc, VALUE *argv, VALUE obj )
     srcimage = DXRUBY_GET_STRUCT( Image, data );
     DXRUBY_CHECK_DISPOSE( srcimage, texture );
 
-    if( dstimage == srcimage ) rb_raise( eDXRubyError, "描画元と先に同じImageオブジェクトが指定されています - Image_copyRect" );
+    if( dstimage == srcimage ) rb_raise( eDXRubyError, "The same Image object is specified as the drawing source and the destination - Image_copyRect" );
 
     x = NUM2INT( vx );
     y = NUM2INT( vy );
@@ -1863,7 +1863,7 @@ static VALUE Image_draw( int argc, VALUE *argv, VALUE obj )
     srcimage = DXRUBY_GET_STRUCT( Image, data );
     DXRUBY_CHECK_DISPOSE( srcimage, texture );
 
-    if( dstimage == srcimage ) rb_raise( eDXRubyError, "描画元と先に同じImageオブジェクトが指定されています - Image_draw" );
+    if( dstimage == srcimage ) rb_raise( eDXRubyError, "The same Image object is specified as the drawing source and the destination - Image_draw" );
 
     x = NUM2INT( vx );
     y = NUM2INT( vy );
@@ -2541,7 +2541,7 @@ VALUE Image_effect( int argc, VALUE *argv, VALUE self )
 
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - Image_initialize" );
+        rb_raise( eDXRubyError, "Out of memory - Image_initialize" );
     }
 
     DXRUBY_RETRY_START;
@@ -2552,7 +2552,7 @@ VALUE Image_effect( int argc, VALUE *argv, VALUE self )
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - Image_initialize" );
+        rb_raise( eDXRubyError, "Create texture error - Image_initialize" );
     }
 
     texture->refcount = 1;
@@ -2834,7 +2834,7 @@ VALUE Image_change_hls( int argc, VALUE *argv, VALUE self )
     texture = (struct  DXRubyTexture *)malloc( sizeof( struct DXRubyTexture ) );
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - Image_change_hls" );
+        rb_raise( eDXRubyError, "Out of memory - Image_change_hls" );
     }
 
     DXRUBY_RETRY_START;
@@ -2845,7 +2845,7 @@ VALUE Image_change_hls( int argc, VALUE *argv, VALUE self )
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - Image_change_hls" );
+        rb_raise( eDXRubyError, "Create texture error - Image_change_hls" );
     }
 
     texture->refcount = 1;
@@ -2964,7 +2964,7 @@ VALUE Image_save( int argc, VALUE *argv, VALUE self )
             NULL);                                              /* パレット */
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "ファイルの保存に失敗しました - Image_save" );
+        rb_raise( eDXRubyError, "Save error - Image_save" );
     }
 
     return self;
