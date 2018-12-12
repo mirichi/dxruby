@@ -104,7 +104,7 @@ static VALUE Sprite_allocate( VALUE klass )
 
     /* DXRubySpriteのメモリ取得＆Spriteオブジェクト生成 */
     sprite = malloc( sizeof(struct DXRubySprite) );
-    if( sprite == NULL ) rb_raise( eDXRubyError, "メモリの取得に失敗しました - Sprite_allocate" );
+    if( sprite == NULL ) rb_raise( eDXRubyError, "Out of memory - Sprite_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
     obj = TypedData_Wrap_Struct( klass, &Sprite_data_type, sprite );
 #else

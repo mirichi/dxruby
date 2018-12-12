@@ -71,7 +71,7 @@ static void Sound_free( struct DXRubySound *sound )
         hr = sound->pDMSegment->lpVtbl->Unload( sound->pDMSegment, (IUnknown* )sound->pDMDefAudioPath );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "バンドの解放に失敗しました - Unload" );
+            rb_raise( eDXRubyError, "Band release failed - Unload" );
         }
         /* セグメントを開放 */
         RELEASE( sound->pDMSegment );
@@ -90,7 +90,7 @@ static void Sound_free( struct DXRubySound *sound )
             hr = g_pDMPerformance->lpVtbl->Stop( g_pDMPerformance, NULL, NULL, 0, 0 );
             if ( FAILED( hr ) )
             {
-                rb_raise( eDXRubyError, "パフォーマンスの終了に失敗しました - Stop" );
+                rb_raise( eDXRubyError, "Stop performance failed - Stop" );
             }
             g_pDMPerformance->lpVtbl->CloseDown( g_pDMPerformance );
         }
@@ -168,7 +168,7 @@ static VALUE Sound_allocate( VALUE klass )
 
     /* DXRubyImageのメモリ取得＆Imageオブジェクト生成 */
     sound = malloc(sizeof(struct DXRubySound));
-    if( sound == NULL ) rb_raise( eDXRubyError, "メモリの取得に失敗しました - Sound_allocate" );
+    if( sound == NULL ) rb_raise( eDXRubyError, "Out of memory - Sound_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
     obj = TypedData_Wrap_Struct( klass, &Sound_data_type, sound );
 #else
@@ -208,7 +208,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
                                (void**)&g_pDMPerformance );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "DirectMusicの初期化に失敗しました - CoCreateInstance" );
+            rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
         }
 
         /* パフォーマンスの初期化 */
@@ -222,7 +222,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
                                                   NULL );                /* オーディオ・パラメータにはデフォルトを使用 */
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "DirectMusicの初期化に失敗しました - InitAudio" );
+            rb_raise( eDXRubyError, "DirectMusic initialize error - InitAudio" );
         }
 
         /* ローダーの作成 */
@@ -231,14 +231,14 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
                                (void**)&g_pDMLoader );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "DirectMusicの初期化に失敗しました - CoCreateInstance" );
+            rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
         }
 
         /* ローダーの初期化（検索パスをカレント・ディレクトリに設定） */
         i = GetCurrentDirectory( MAX_PATH, strPath );
         if ( i == 0 || MAX_PATH < i )
         {
-            rb_raise( eDXRubyError, "カレント・ディレクトリの取得に失敗 - GetCurrentDirectory" );
+            rb_raise( eDXRubyError, "Get current directory failed - GetCurrentDirectory" );
         }
 
         /* マルチ・バイト文字をUNICODEに変換 */
@@ -249,7 +249,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
                                                       wstrSearchPath, FALSE );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "検索パスの設定に失敗 - SetSearchDirectory" );
+            rb_raise( eDXRubyError, "Set directory failed - SetSearchDirectory" );
         }
     }
     g_iRefDM++;
@@ -274,7 +274,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 
     if ( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "オーディオパスの作成に失敗しました - CreateStandardAudioPath" );
+        rb_raise( eDXRubyError, "AudioPath set error - CreateStandardAudioPath" );
     }
 
     sound->vbuffer = vstr;
@@ -295,7 +295,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
     if( FAILED( hr ) )
     {
         sound->pDMSegment = NULL;
-        rb_raise( eDXRubyError, "ファイルのロードに失敗しました - LoadObjectFromFile" );
+        rb_raise( eDXRubyError, "Load error - LoadObjectFromFile" );
     }
 
     sound->start = 0;
@@ -309,7 +309,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
                                                   0xFFFFFFFF, 0, 0, NULL);
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ファイルのロードに失敗しました - SetParam" );
+            rb_raise( eDXRubyError, "Load error - SetParam" );
         }
         sound->loopcount = DMUS_SEG_REPEAT_INFINITE;
         sound->midwavflag = 0;
@@ -318,7 +318,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ループ回数の設定に失敗しました - SetRepeats" );
+            rb_raise( eDXRubyError, "Set loop count failed - SetRepeats" );
         }
     }
     else
@@ -332,7 +332,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "バンドのロードに失敗しました - Download" );
+        rb_raise( eDXRubyError, "Band loading failed - Download" );
     }
 
 
@@ -341,7 +341,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音量の設定に失敗しました - SetVolume" );
+        rb_raise( eDXRubyError, "Set volume failed - SetVolume" );
     }
 
     return obj;
@@ -373,7 +373,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 	                           (void**)&g_pDMPerformance );
 	    if( FAILED( hr ) )
 	    {
-	        rb_raise( eDXRubyError, "DirectMusicの初期化に失敗しました - CoCreateInstance" );
+	        rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
 	    }
 
 	    /* パフォーマンスの初期化 */
@@ -387,7 +387,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 	                                              NULL );                /* オーディオ・パラメータにはデフォルトを使用 */
 	    if( FAILED( hr ) )
 	    {
-	        rb_raise( eDXRubyError, "DirectMusicの初期化に失敗しました - InitAudio" );
+	        rb_raise( eDXRubyError, "DirectMusic initialize error - InitAudio" );
 	    }
 
 	    /* ローダーの作成 */
@@ -396,14 +396,14 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 	                           (void**)&g_pDMLoader );
 	    if( FAILED( hr ) )
 	    {
-	        rb_raise( eDXRubyError, "DirectMusicの初期化に失敗しました - CoCreateInstance" );
+	        rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
 	    }
 
 	    /* ローダーの初期化（検索パスをカレント・ディレクトリに設定） */
 	    i = GetCurrentDirectory( MAX_PATH, strPath );
 	    if ( i == 0 || MAX_PATH < i )
 	    {
-	        rb_raise( eDXRubyError, "カレント・ディレクトリの取得に失敗 - GetCurrentDirectory" );
+	        rb_raise( eDXRubyError, "Get current directory failed - GetCurrentDirectory" );
 	    }
 
 	    /* マルチ・バイト文字をUNICODEに変換 */
@@ -414,7 +414,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 	                                                  wstrSearchPath, FALSE );
 	    if( FAILED( hr ) )
 	    {
-	        rb_raise( eDXRubyError, "検索パスの設定に失敗 - SetSearchDirectory" );
+	        rb_raise( eDXRubyError, "Set directory failed - SetSearchDirectory" );
 	    }
 	}
     g_iRefDM++;
@@ -438,7 +438,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 
 	if ( FAILED( hr ) )
 	{
-        rb_raise( eDXRubyError, "オーディオパスの作成に失敗しました - CreateStandardAudioPath" );
+        rb_raise( eDXRubyError, "AudioPath set error - CreateStandardAudioPath" );
 	}
 
     /* ファイルロード */
@@ -459,7 +459,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
     if( FAILED( hr ) )
     {
         sound->pDMSegment = NULL;
-        rb_raise( eDXRubyError, "ファイルのロードに失敗しました - LoadObjectFromFile" );
+        rb_raise( eDXRubyError, "Load error - LoadObjectFromFile" );
     }
 
     sound->start = 0;
@@ -473,7 +473,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
                                                   0xFFFFFFFF, 0, 0, NULL);
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ファイルのロードに失敗しました - SetParam" );
+            rb_raise( eDXRubyError, "Load error - SetParam" );
         }
         sound->loopcount = DMUS_SEG_REPEAT_INFINITE;
         sound->midwavflag = 0;
@@ -482,7 +482,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ループ回数の設定に失敗しました - SetRepeats" );
+            rb_raise( eDXRubyError, "Set loop count failed - SetRepeats" );
         }
     }
     else
@@ -496,7 +496,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "バンドのロードに失敗しました - Download" );
+        rb_raise( eDXRubyError, "Band loading failed - Download" );
     }
 
 
@@ -505,7 +505,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音量の設定に失敗しました - SetVolume" );
+        rb_raise( eDXRubyError, "Set volume failed - SetVolume" );
     }
 
     return obj;
@@ -529,7 +529,7 @@ static VALUE Sound_setStart( VALUE obj, VALUE vstart )
         hr = sound->pDMSegment->lpVtbl->SetLength( sound->pDMSegment, sound->start * DMUS_PPQ / 768 + 1 );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "セグメント開始位置の設定に失敗しました - SetLength" );
+            rb_raise( eDXRubyError, "Set start point failed - SetLength" );
         }
     }
 
@@ -538,7 +538,7 @@ static VALUE Sound_setStart( VALUE obj, VALUE vstart )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "セグメント開始位置の設定に失敗しました - SetStartPoint" );
+        rb_raise( eDXRubyError, "Set start point failed - SetStartPoint" );
     }
 
     return obj;
@@ -559,7 +559,7 @@ static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
 
     if( sound->midwavflag == 1 )
     {
-        rb_raise( eDXRubyError, "WAVデータにループ開始位置は設定できません - Sound_loopStart=" );
+        rb_raise( eDXRubyError, "Can not be set to Wav data - Sound_loopStart=" );
     }
 
     if( sound->loopstart <= sound->loopend )
@@ -569,7 +569,7 @@ static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
                                                                         , sound->loopend * DMUS_PPQ / 768 );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ループ範囲の設定に失敗しました - SetLoopPoints" );
+            rb_raise( eDXRubyError, "Set loop points failed - SetLoopPoints" );
         }
     }
     else
@@ -579,7 +579,7 @@ static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
 
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ループ範囲の設定に失敗しました - SetLoopPoints" );
+            rb_raise( eDXRubyError, "Set loop points failed - SetLoopPoints" );
         }
     }
 
@@ -601,7 +601,7 @@ static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
 
     if( sound->midwavflag == 1 )
     {
-        rb_raise( eDXRubyError, "WAVデータにループ終了位置は設定できません - Sound_loopEnd=" );
+        rb_raise( eDXRubyError, "Can not be set to Wav data - Sound_loopEnd=" );
     }
 
     if( sound->loopstart <= sound->loopend )
@@ -611,7 +611,7 @@ static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
                                                                         , sound->loopend * DMUS_PPQ / 768 );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ループ範囲の設定に失敗しました - SetLoopPoints" );
+            rb_raise( eDXRubyError, "Set loop points failed - SetLoopPoints" );
         }
     }
     else
@@ -621,7 +621,7 @@ static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
 
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "ループ範囲の設定に失敗しました - SetLoopPoints" );
+            rb_raise( eDXRubyError, "Set loop points failed - SetLoopPoints" );
         }
     }
 
@@ -647,7 +647,7 @@ static VALUE Sound_setLoopCount( VALUE obj, VALUE vloopcount )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "ループ回数の設定に失敗しました - SetRepeats" );
+        rb_raise( eDXRubyError, "Failed to set loop count - SetRepeats" );
     }
 
     return obj;
@@ -676,7 +676,7 @@ static VALUE Sound_setVolume( int argc, VALUE *argv, VALUE obj )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音量の設定に失敗しました - SetVolume" );
+        rb_raise( eDXRubyError, "Set volume error - SetVolume" );
     }
 
     return obj;
@@ -841,7 +841,7 @@ static VALUE Sound_play( VALUE obj )
     }
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音の再生に失敗しました - PlaySegmentEx" );
+        rb_raise( eDXRubyError, "Sound play failed - PlaySegmentEx" );
     }
 
     return obj;
@@ -864,7 +864,7 @@ static VALUE Sound_stop( VALUE obj )
 
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音の停止に失敗しました - StopEx" );
+        rb_raise( eDXRubyError, "Sound stop failed - StopEx" );
     }
 
     return obj;
@@ -958,7 +958,7 @@ static VALUE SoundEffect_allocate( VALUE klass )
 
     /* DXRubySoundEffectのメモリ取得＆SoundEffectオブジェクト生成 */
     soundeffect = malloc(sizeof(struct DXRubySoundEffect));
-    if( soundeffect == NULL ) rb_raise( eDXRubyError, "メモリの取得に失敗しました - SoundEffect_allocate" );
+    if( soundeffect == NULL ) rb_raise( eDXRubyError, "Out of memory - SoundEffect_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
     obj = TypedData_Wrap_Struct( klass, &SoundEffect_data_type, soundeffect );
 #else
@@ -1047,13 +1047,13 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
         hr = DirectSoundCreate8( &DSDEVID_DefaultPlayback, &g_pDSound, NULL );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "DirectSoundの初期化に失敗しました - DirectSoundCreate8" );
+            rb_raise( eDXRubyError, "DirectSound initialize error - DirectSoundCreate8" );
         }
 
         hr = g_pDSound->lpVtbl->SetCooperativeLevel( g_pDSound, g_hWnd, DSSCL_PRIORITY );
         if( FAILED( hr ) )
         {
-            rb_raise( eDXRubyError, "DirectSoundの初期化に失敗しました - SetCooperativeLevel" );
+            rb_raise( eDXRubyError, "DirectSound initialize error - SetCooperativeLevel" );
         }
     }
     g_iRefDS++;
@@ -1302,20 +1302,20 @@ static VALUE SoundEffect_play( int argc, VALUE *argv, VALUE self )
     hr = se->pDSBuffer->lpVtbl->Stop( se->pDSBuffer );
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音の再生に失敗しました - SoundEffect_play" );
+        rb_raise( eDXRubyError, "Sound play failed - SoundEffect_play" );
     }
 
     hr = se->pDSBuffer->lpVtbl->SetCurrentPosition( se->pDSBuffer, 0 );
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音の再生に失敗しました - SoundEffect_play" );
+        rb_raise( eDXRubyError, "Sound play failed - SoundEffect_play" );
     }
 
     /* 再生 */
     hr = se->pDSBuffer->lpVtbl->Play( se->pDSBuffer, 0, 0, RTEST(vflag) ? DSBPLAY_LOOPING : 0 );
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "音の再生に失敗しました - SoundEffect_play" );
+        rb_raise( eDXRubyError, "Sound play failed - SoundEffect_play" );
     }
     return self;
 }

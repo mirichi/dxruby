@@ -779,7 +779,7 @@ static VALUE Window_running_time( VALUE klass )
 {
     if( !g_WindowInfo.created )
     {
-        rb_raise( eDXRubyError, "ウィンドウ作成前に実行することはできません - Window_running_time" );
+        rb_raise( eDXRubyError, "It can not be executed before window creation - Window_running_time" );
     }
 
     return rb_float_new( g_RunningTime * 1000.0 / g_OneSecondCount );
@@ -867,7 +867,7 @@ static VALUE Window_setx( VALUE klass, VALUE x )
 {
     if( g_WindowInfo.created )
     {
-        rb_raise( eDXRubyError, "ウィンドウ作成後に設定を変更することはできません - Window_setx" );
+        rb_raise( eDXRubyError, "It is not possible to change the setting after window creation - Window_setx" );
     }
 
     g_WindowInfo.x = NUM2INT( x );
@@ -882,7 +882,7 @@ static VALUE Window_sety( VALUE klass , VALUE y )
 {
     if( g_WindowInfo.created )
     {
-        rb_raise( eDXRubyError, "ウィンドウ作成後に設定を変更することはできません - Window_sety" );
+        rb_raise( eDXRubyError, "It is not possible to change the setting after window creation - Window_sety" );
     }
 
     g_WindowInfo.y = NUM2INT( y );
@@ -899,7 +899,7 @@ static VALUE Window_setwidth( VALUE klass, VALUE vwidth )
 
     if( g_WindowInfo.created )
     {
-        rb_raise( eDXRubyError, "ウィンドウ作成後に設定を変更することはできません - Window_setwidth" );
+        rb_raise( eDXRubyError, "It is not possible to change the setting after window creation - Window_setwidth" );
     }
 
     width = NUM2INT( vwidth );
@@ -922,7 +922,7 @@ static VALUE Window_setheight( VALUE klass , VALUE vheight)
 
     if( g_WindowInfo.created )
     {
-        rb_raise( eDXRubyError, "ウィンドウ作成後に設定を変更することはできません - Window_setheight" );
+        rb_raise( eDXRubyError, "It is not possible to change the setting after window creation - Window_setheight" );
     }
 
     height = NUM2INT( vheight );
@@ -1931,7 +1931,7 @@ static VALUE ShaderCore_allocate( VALUE klass )
 
     /* DXRubyShaderCoreのメモリ取得＆ShaderCoreオブジェクト生成 */
     core = malloc( sizeof( struct DXRubyShaderCore ) );
-    if( core == NULL ) rb_raise( eDXRubyError, "メモリの取得に失敗しました - ShaderCore_allocate" );
+    if( core == NULL ) rb_raise( eDXRubyError, "Out of memory - ShaderCore_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
     obj = TypedData_Wrap_Struct( klass, &ShaderCore_data_type, core );
 #else
@@ -2041,7 +2041,7 @@ static VALUE Shader_allocate( VALUE klass )
 
     /* DXRubyShaderのメモリ取得＆ShaderCoreオブジェクト生成 */
     shader = malloc( sizeof( struct DXRubyShader ) );
-    if( shader == NULL ) rb_raise( eDXRubyError, "メモリの取得に失敗しました - Shader_allocate" );
+    if( shader == NULL ) rb_raise( eDXRubyError, "Out of memory - Shader_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
     obj = TypedData_Wrap_Struct( klass, &Shader_data_type, shader );
 #else
@@ -2379,7 +2379,7 @@ static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
 
     if( width <= 0 || height <= 0 )
     {
-        rb_raise( eDXRubyError, "RenderTargetオブジェクトの作成に失敗しました - RenderTarget_initialize" );
+        rb_raise( eDXRubyError, "Argument error(width<=0 or height<=0) - RenderTarget_initialize" );
     }
 
     /* テクスチャメモリ取得 */
@@ -2387,7 +2387,7 @@ static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
 
     if( texture == NULL )
     {
-        rb_raise( eDXRubyError, "画像用メモリの取得に失敗しました - RenderTarget_initialize" );
+        rb_raise( eDXRubyError, "Out of memory - RenderTarget_initialize" );
     }
 
     DXRUBY_RETRY_START;
@@ -2398,7 +2398,7 @@ static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - RenderTarget_initialize" );
+        rb_raise( eDXRubyError, "Create texture failed - RenderTarget_initialize" );
     }
 
     texture->pD3DTexture->lpVtbl->GetSurfaceLevel( texture->pD3DTexture, 0, &rt->surface );
@@ -2456,7 +2456,7 @@ static VALUE RenderTarget_resize( VALUE self, VALUE vwidth, VALUE vheight )
 
     if( width <= 0 || height <= 0 )
     {
-        rb_raise( eDXRubyError, "RenderTargetオブジェクトの作成に失敗しました - RenderTarget_resize" );
+        rb_raise( eDXRubyError, "Argument error(width<=0 or height<=0) - RenderTarget_resize" );
     }
 
     texture = rt->texture;
@@ -2471,7 +2471,7 @@ static VALUE RenderTarget_resize( VALUE self, VALUE vwidth, VALUE vheight )
     DXRUBY_RETRY_END;
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - RenderTarget_resize" );
+        rb_raise( eDXRubyError, "Create texture failed - RenderTarget_resize" );
     }
 
     texture->pD3DTexture->lpVtbl->GetSurfaceLevel( texture->pD3DTexture, 0, &rt->surface );
@@ -2542,15 +2542,15 @@ static VALUE RenderTarget_to_image( VALUE self )
                                       1, 0, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM,
                                       &pD3DTexture);
     DXRUBY_RETRY_END;
-    if( FAILED( hr ) ) rb_raise( eDXRubyError, "テクスチャの作成に失敗しました - RenderTarget_to_image" );
+    if( FAILED( hr ) ) rb_raise( eDXRubyError, "Create texture failed - RenderTarget_to_image" );
 
     /* テクスチャのサーフェイスを取得 */
     hr = pD3DTexture->lpVtbl->GetSurfaceLevel( pD3DTexture, 0, &surface );
-    if( FAILED( hr ) ) rb_raise( eDXRubyError, "サーフェイスの作成に失敗しました - RenderTarget_to_image" );
+    if( FAILED( hr ) ) rb_raise( eDXRubyError, "Get surface failed - RenderTarget_to_image" );
 
     /* レンダーターゲットのイメージ取得 */
     hr = g_pD3DDevice->lpVtbl->GetRenderTargetData( g_pD3DDevice, rt->surface, surface );
-    if( FAILED( hr ) ) rb_raise( eDXRubyError, "イメージの取得に失敗しました - RenderTarget_to_image" );
+    if( FAILED( hr ) ) rb_raise( eDXRubyError, "Get image data failed - RenderTarget_to_image" );
 
     /* イメージのコピー */
     srect.left = rt->x;
@@ -2668,7 +2668,7 @@ void *RenderTarget_AllocPictureList( struct DXRubyRenderTarget *rt, int size )
         char *temp = rt->PictureStruct;
         rt->PictureAllocateSize = rt->PictureAllocateSize * 3 / 2; /* 1.5倍にする */
         rt->PictureStruct = realloc( rt->PictureStruct, rt->PictureAllocateSize );
-        if( rt->PictureStruct == NULL ) rb_raise(eDXRubyError, "メモリが取得できませんでした - RenderTarget_draw");
+        if( rt->PictureStruct == NULL ) rb_raise(eDXRubyError, "Out of memory - RenderTarget_draw");
         for( i = 0; i < rt->PictureCount; i++)
         {
             rt->PictureList[i].picture = (struct DXRubyPicture *)((char *)rt->PictureList[i].picture + ((char*)rt->PictureStruct - temp));
@@ -2681,7 +2681,7 @@ void *RenderTarget_AllocPictureList( struct DXRubyRenderTarget *rt, int size )
     {
         rt->PictureAllocateCount = rt->PictureAllocateCount * 3 / 2; /* 1.5倍にする */
         rt->PictureList = realloc( rt->PictureList, rt->PictureAllocateCount * sizeof(struct DXRubyPictureList) );
-        if( rt->PictureList == NULL ) rb_raise(eDXRubyError, "メモリが取得できませんでした - RenderTarget_draw");
+        if( rt->PictureList == NULL ) rb_raise(eDXRubyError, "Out of memory - RenderTarget_draw");
     }
 
     return result;
@@ -3703,7 +3703,7 @@ static int Window_drawShader_func_foreach( VALUE key, VALUE value, VALUE obj ) /
         }
         else
         {
-            rb_raise( eDXRubyError, "textureパラメータに画像以外が渡されています - Window_draw" );
+            rb_raise( eDXRubyError, "Argument error(texture) - Window_draw" );
         }
     }
     else if( vtype == symbol_int )
@@ -3739,7 +3739,7 @@ static int Window_drawShader_func_foreach( VALUE key, VALUE value, VALUE obj ) /
     }
     else
     {
-        rb_raise( eDXRubyError, "Shaderオブジェクトのパラメータの型が不明です - Window_draw" );
+        rb_raise( eDXRubyError, "Unknown parameter type of shader object - Window_draw" );
     }
 
     return ST_CONTINUE;
@@ -4293,7 +4293,7 @@ static VALUE RenderTarget_drawFont( int argc, VALUE *argv, VALUE obj )
     picture = (struct DXRubyPicture_drawFont *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawFont ) );
     if( picture == NULL )
     {
-        rb_raise( eDXRubyError, "フォント用メモリの確保に失敗しました" );
+        rb_raise( eDXRubyError, "Out of memory" );
     }
 
     /* DXRubyPictureオブジェクト設定 */
@@ -4748,7 +4748,7 @@ void RenderTarget_drawTile_func( struct DXRubyPicture_drawTile *picture )
             {
                 index = NUM2INT( arr2[mx] );
 
-                if( index >= RARRAY_LEN( vmapdata ) ) rb_raise(eDXRubyError, "マップチップ番号がイメージ配列の範囲を超えています - Window_drawTile");
+                if( index >= RARRAY_LEN( vmapdata ) ) rb_raise(eDXRubyError, "Invalid MapChipNumber - Window_drawTile");
 
                 /* イメージオブジェクトから中身を取り出す */
                 image = (struct DXRubyImage *)DATA_PTR( mapdata[index] );
