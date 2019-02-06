@@ -280,6 +280,16 @@ void inputupdate_internal( void )
     memcpy( g_diKeyStateOld, g_diKeyState, sizeof(g_diKeyState) );
     g_pDIDKeyBoard->lpVtbl->GetDeviceState( g_pDIDKeyBoard, 256, g_diKeyState );
 
+    for( i = 0; i < PADMAX; i++ )
+    {
+        for( j = 0; j < PADBUTTON_MAX; j++ )
+        {
+            g_PadStateOld[i].button[j] = g_PadState[i].button[j];
+            g_PadState[i].button[j] = 0;
+            g_PadState[i].count[j]++; /* カウント */
+        }
+    }
+
     /* ゲームパッドのデータを取得する */
     for( i = 0; i < g_JoystickCount; i++ )
     {
@@ -358,13 +368,6 @@ void inputupdate_internal( void )
 //          printf("g_PadInfo[%d].r_forward = 0x%08X\n", i, g_PadInfo[i].r_forward);
 //          printf("g_PadInfo[%d].r_backward = 0x%08X\n", i, g_PadInfo[i].r_backward);
 //        }
-
-        for( j = 0; j < PADBUTTON_MAX; j++ )
-        {
-            g_PadStateOld[i].button[j] = g_PadState[i].button[j];
-            g_PadState[i].button[j] = 0;
-            g_PadState[i].count[j]++; /* カウント */
-        }
 
         /* 各軸を0.0～1.0の値に計算 */
         g_PadState[i].x = g_PadInfo[i].x_flg ? (float)(paddata.lX - g_PadInfo[i].x_min) / (g_PadInfo[i].x_max - g_PadInfo[i].x_min) : 0;
