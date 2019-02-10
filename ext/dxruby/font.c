@@ -577,7 +577,7 @@ void Font_getInfo_internal( VALUE vstr, struct DXRubyFont *font, int *intBlackBo
                                     &gm, 0, NULL, &mat2 );
     ReleaseDC( g_hWnd, hDC );
 
-    *intBlackBoxY = gm.gmBlackBoxX;
+    *intBlackBoxX = gm.gmBlackBoxX;
     *intBlackBoxY = gm.gmBlackBoxY;
     *intCellIncX = gm.gmCellIncX;
     *intPtGlyphOriginX = gm.gmptGlyphOrigin.x;
